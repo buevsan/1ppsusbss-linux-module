@@ -5,6 +5,7 @@
 #include <linux/hrtimer.h>
 #include <linux/delay.h>
 #include <linux/slab.h>
+#include <linux/version.h>
 
 #define BULK_EP_OUT 0x01
 #define BULK_EP_IN 0x81
@@ -18,6 +19,20 @@ MODULE_PARM_DESC(delay,
 	"Delay between setting and dropping the signal (ns)");
 module_param_named(delay, send_delay, uint, 0);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
+  #define timespec_sub( a, b ) timespec64_sub( a, b )
+  #define getnstimeofday( a ) ktime_get_real_ts64( a )
+  #define timespec_to_ns( a ) timespec64_to_ns( a )
+  #ifdef ktime_to_timespec 
+    #undef ktime_to_timespec 
+  #endif
+  #define ktime_to_timespec( a ) ktime_to_timespec64( a )
+  #define timespec timespec64
+  #define PRIts_sec "lld"
+  #define time_t time64_t
+#else
+  #define PRIts_sec "ld"
+#endif  
 
 #define SAFETY_INTERVAL	3000	/* set the hrtimer earlier for safety (ns) */
 
