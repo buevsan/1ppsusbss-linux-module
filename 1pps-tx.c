@@ -9,7 +9,12 @@
 #include <linux/kthread.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
-#include <uapi/linux/sched/types.h>
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,11,0)
+  #include <linux/sched.h>
+#else
+  #include <uapi/linux/sched/types.h>
+#endif
 
 #define BULK_EP_OUT 0x01
 #define BULK_EP_IN 0x81
@@ -33,6 +38,9 @@ MODULE_PARM_DESC(period,
 	"Signal period (ns)");
 module_param_named(period, signal_period_ns, ulong, 0);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,10,0)
+ #define ktime_t u64
+#endif
 
 #define PRIkt "llu"
 
