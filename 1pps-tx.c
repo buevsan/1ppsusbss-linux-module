@@ -216,7 +216,10 @@ int m1pps_thread(void *data)
 
     lwt = ct;
 
-    usleep_range( sleep_us, sleep_us );
+    if ( sleep_us >= 10 ) 
+      usleep_range( sleep_us, sleep_us );
+    else 
+      udelay( sleep_us );
 
     ct = ktime_get_real_ns();
 
